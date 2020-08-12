@@ -14,14 +14,22 @@ spec:
         app: vsphere-csi-controller
         role: vsphere-csi
     spec:
+      priorityClassName: system-cluster-critical
       serviceAccountName: vsphere-csi-controller
       nodeSelector:
         node-role.kubernetes.io/master: ""
       tolerations:
-        - operator: "Exists"
-          effect: NoSchedule
-        - operator: "Exists"
-          effect: NoExecute
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Equal
+        - effect: NoExecute
+          operator: Equal
+          key: node.kubernetes.io/not-ready
+          tolerationSeconds: 30
+        - effect: NoExecute
+          operator: Equal
+          key: node.kubernetes.io/unreachable
+          tolerationSeconds: 30
       dnsPolicy: "Default"
       containers:
         - name: csi-attacher
